@@ -16,9 +16,9 @@ function initApp() {
     .querySelector("#btn-create-post")
     .addEventListener("click", showCreatePostDialog);
 
-  // document
-  //   .querySelector("#btn-create-post")
-  //   .addEventListener("click", createPostClicked);
+  document
+    .querySelector("#form-delete-post")
+    .addEventListener("submit", deletePostClicked);
 }
 
 // ============== events ============== //
@@ -30,8 +30,8 @@ function createPostClicked(event) {
   const body = form.body.value;
   const image = form.image.value;
   createPost(title, body, image);
-    form.reset();
-    document.querySelector("#dialog-create-post").close();
+  form.reset();
+  document.querySelector("#dialog-create-post").close();
 }
 
 function showCreatePostDialog() {
@@ -41,7 +41,6 @@ function showCreatePostDialog() {
   document
     .querySelector("#form-create-post")
     .addEventListener("submit", createPostClicked);
-    
 }
 
 // todo
@@ -70,7 +69,7 @@ function showPosts(listOfPosts) {
 }
 
 function showPost(postObject) {
-  const html = /*html*/ `
+    const html = /*html*/ `
         <article class="grid-item">
             <img src="${postObject.image}" />
             <h3>${postObject.title}</h3>
@@ -81,28 +80,53 @@ function showPost(postObject) {
             </div>
         </article>
     `; // html variable to hold generated html in backtick
-  document.querySelector("#posts").insertAdjacentHTML("beforeend", html); // append html to the DOM - section#posts
+    document.querySelector("#posts").insertAdjacentHTML("beforeend", html); // append html to the DOM - section#posts
 
-  // add event listeners to .btn-delete and .btn-update
-  document
-    .querySelector("#posts article:last-child .btn-delete")
-    .addEventListener("click", deleteClicked);
-  document
-    .querySelector("#posts article:last-child .btn-update")
-    .addEventListener("click", updateClicked);
+    // add event listeners to .btn-delete and .btn-update
+    document
+        .querySelector("#posts article:last-child .btn-delete")
+        .addEventListener("click", deleteClicked);
+    document
+        .querySelector("#posts article:last-child .btn-update")
+        .addEventListener("click", updateClicked);
+}
+
 
   // called when delete button is clicked
-  function deleteClicked() {
-    console.log("Update button clicked");
+  function deleteClicked(postObject) {
+    console.log("Delete button clicked");
+    document.querySelector("#dialog-delete-post-title").textContent =
+      postObject.title;
+    document
+      .querySelector("#form-delete-post")
+      .setAttribute("data-id", postObject.id);
+    document.querySelector("#dialog-delete-post").showModal();
+
     // to do
+  }
+
+function deletePostClicked(event) {
+  const id = event.target.getAttribute("data-id");
+  deletePost(id);
+}
+
+      async function deletePost(id) {
+        const response = await fetch(`${endpoint}/posts/${id}.json`, {
+          method: "DELETE",
+        });
+        
+    if (response.ok) {
+        console.log("Delete post works");
+        updatePostsGrid();
+    }
   }
 
   // called when update button is clicked
   function updateClicked() {
-    console.log("Delete button clicked");
+    console.log("Update button clicked");
     // to do
   }
-}
+
 
 // Create a new post - HTTP Method: POST
 async function createPost(title, body, image) {
@@ -131,11 +155,11 @@ async function createPost(title, body, image) {
 // update the post grid to display all posts and the new post
 
 // Update an existing post - HTTP Method: DELETE
-async function deletePost(id) {
-  // DELETE fetch request
-  // check if response is ok - if the response is successful
-  // update the post grid to display posts
-}
+// async function deletePost(id) {
+// DELETE fetch request
+// check if response is ok - if the response is successful
+// update the post grid to display posts
+// }
 
 // Delete an existing post - HTTP Method: PUT
 async function updatePost(id, title, body, image) {
