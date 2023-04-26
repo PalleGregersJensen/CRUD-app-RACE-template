@@ -27,6 +27,9 @@ function initApp() {
   document
     .querySelector("#form-delete-post .btn-cancel")
     .addEventListener("click", cancelDelete);
+
+    document.querySelector("#form-update-post").addEventListener("submit", updatePostClicked);
+
 }
 
 // ============== events ============== //
@@ -105,8 +108,8 @@ function showPost(postObject) {
     .addEventListener("click", updateClicked);
 
   // called when delete button is clicked
-  
-    function deleteClicked() {
+
+  function deleteClicked() {
     console.log("Delete button clicked");
     document.querySelector("#dialog-delete-post-title").textContent =
       postObject.title;
@@ -114,11 +117,25 @@ function showPost(postObject) {
       .querySelector("#form-delete-post")
       .setAttribute("data-id", postObject.id);
     document.querySelector("#dialog-delete-post").showModal();
-
-    // to do
   }
-}    
-    
+    // to do
+
+    // called when update button is clicked
+    function updateClicked() {
+      console.log("Update button clicked");
+        const updateForm = document.querySelector("#form-update-post");
+        updateForm.title.value = postObject.title;
+        updateForm.body.value = postObject.body;
+        updateForm.image.value = postObject.image;
+        updateForm.setAttribute("data-id", postObject.id);
+        document.querySelector("#dialog-update-post").showModal();
+      }
+
+      
+      // to do
+  
+}
+
 function deletePostClicked(event) {
   const id = event.target.getAttribute("data-id");
   deletePost(id);
@@ -133,12 +150,6 @@ async function deletePost(id) {
     console.log("Delete post works");
     updatePostsGrid();
   }
-}
-
-// called when update button is clicked
-function updateClicked() {
-  console.log("Update button clicked");
-  // to do
 }
 
 // Create a new post - HTTP Method: POST
@@ -159,6 +170,17 @@ async function createPost(title, body, image) {
     console.log("New post succesfully added to Firebase");
     updatePostsGrid();
   }
+}
+
+function updatePostClicked(event) {
+    event.preventDefault();
+    const form = event.target;
+    const title = form.title.value;
+    const body = form.body.value;
+    const image = form.image.value;
+    const id = form.getAttribute("data-id");
+    updatePost(title, body, image, id);
+    document.querySelector("#dialog-update-post").close();
 }
 
 // create new post object
