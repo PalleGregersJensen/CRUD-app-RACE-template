@@ -30,6 +30,10 @@ function initApp() {
 
     document.querySelector("#form-update-post").addEventListener("submit", updatePostClicked);
 
+  document.querySelector("#input-search").addEventListener("keyup", inputSearchChanged);
+    document
+      .querySelector("#input-search")
+      .addEventListener("search", inputSearchChanged);
 }
 
 // ============== events ============== //
@@ -225,4 +229,21 @@ function prepareData(dataObject) {
     array.push(object); // add the object to array
   }
   return array; // return array back to "the caller"
+}
+
+function inputSearchChanged(event) {
+  const value = event.target.value;
+  const postsToShow = searchPosts(value);
+  showPosts(postsToShow);
+}
+
+function searchPosts(searchValue) {
+  searchValue = searchValue.toLowerCase()
+  
+  const results = posts.filter(checkTitle);
+  function checkTitle(post) {
+    const title = post.title.toLowerCase();
+    return title.includes(searchValue);
+  }
+  return results;
 }
