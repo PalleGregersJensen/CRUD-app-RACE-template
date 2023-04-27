@@ -132,8 +132,7 @@ function showPost(postObject) {
       }
 
       
-      // to do
-  
+      // to do  
 }
 
 function deletePostClicked(event) {
@@ -179,7 +178,7 @@ function updatePostClicked(event) {
     const body = form.body.value;
     const image = form.image.value;
     const id = form.getAttribute("data-id");
-    updatePost(title, body, image, id);
+    updatePost(id, title, body, image);
     document.querySelector("#dialog-update-post").close();
 }
 
@@ -198,6 +197,14 @@ function updatePostClicked(event) {
 
 // Delete an existing post - HTTP Method: PUT
 async function updatePost(id, title, body, image) {
+  const postToUpdate = { title, body, image };
+  const json = JSON.stringify(postToUpdate);
+  const response = await fetch(`${endpoint}/posts/${id}.json`, { method: "PUT", body: json });
+  if (response.ok) {
+    console.log("Post succesfully updated");
+    updatePostsGrid();
+  }
+  
   // post update to update
   // convert the JS object to JSON string
   // PUT fetch request with JSON in the body. Calls the specific element in resource
