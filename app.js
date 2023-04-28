@@ -58,9 +58,7 @@ function createPostClicked(event) {
   const body = form.body.value;
   const image = form.image.value;
 
-  const post = { title, body, image };
-
-  createPost(post);
+  createPost(title, body, image);
   form.reset();
   document.querySelector("#dialog-create-post").close();
 }
@@ -74,7 +72,6 @@ function showCreatePostDialog() {
     .addEventListener("submit", createPostClicked);
 }
 
-// todo
 
 // ============== posts ============== //
 
@@ -106,6 +103,7 @@ function showPosts(listOfPosts) {
   // return post1.title - post2.title;
   // }
 }
+
 function sortByChanged(event) {
   const value = event.target.value;
 
