@@ -28,12 +28,20 @@ function initApp() {
     .querySelector("#form-delete-post .btn-cancel")
     .addEventListener("click", cancelDelete);
 
-    document.querySelector("#form-update-post").addEventListener("submit", updatePostClicked);
+  document
+    .querySelector("#form-update-post")
+    .addEventListener("submit", updatePostClicked);
 
-  document.querySelector("#input-search").addEventListener("keyup", inputSearchChanged);
-    document
-      .querySelector("#input-search")
-      .addEventListener("search", inputSearchChanged);
+  document
+    .querySelector("#input-search")
+    .addEventListener("keyup", inputSearchChanged);
+  document
+    .querySelector("#input-search")
+    .addEventListener("search", inputSearchChanged);
+
+  document
+    .querySelector("#select-sort-by")
+    .addEventListener("change", sortByChanged);
 }
 
 // ============== events ============== //
@@ -50,7 +58,9 @@ function createPostClicked(event) {
   const body = form.body.value;
   const image = form.image.value;
 
-  createPost(title, body, image);
+  const post = { title, body, image };
+
+  createPost(post);
   form.reset();
   document.querySelector("#dialog-create-post").close();
 }
@@ -78,6 +88,7 @@ async function getPosts() {
   const response = await fetch(`${endpoint}/posts.json`); // fetch request, (GET)
   const data = await response.json(); // parse JSON to JavaScript
   const posts = prepareData(data); // convert object of object to array of objects
+
   return posts; // return posts
 }
 
@@ -86,6 +97,37 @@ function showPosts(listOfPosts) {
 
   for (const post of listOfPosts) {
     showPost(post); // for every post object in listOfPosts, call showPost
+  }
+
+  // posts.sort(compareTitle)
+  // console.log(posts.sort(compareTitle));
+
+  // function compareTitle(post1, post2) {
+  // return post1.title - post2.title;
+  // }
+}
+function sortByChanged(event) {
+  const value = event.target.value;
+
+  if (value === "none") {
+    updatePostsGrid();
+    console.log(posts);
+  } else if (value === "title") {
+    posts.sort(compareTitle);
+    console.log(posts);
+    showPosts(posts);
+  } else if (value === "body") {
+    posts.sort(compareBody);
+    console.log(posts);
+    showPosts(posts);
+  }
+
+  function compareTitle(post1, post2) {
+    return post1.title.localeCompare(post2.title);
+  }
+
+  function compareBody(post1, post2) {
+    return post1.body.localeCompare(post2.body);
   }
 }
 
@@ -122,21 +164,20 @@ function showPost(postObject) {
       .setAttribute("data-id", postObject.id);
     document.querySelector("#dialog-delete-post").showModal();
   }
-    // to do
+  // to do
 
-    // called when update button is clicked
-    function updateClicked() {
-      console.log("Update button clicked");
-        const updateForm = document.querySelector("#form-update-post");
-        updateForm.title.value = postObject.title;
-        updateForm.body.value = postObject.body;
-        updateForm.image.value = postObject.image;
-        updateForm.setAttribute("data-id", postObject.id);
-        document.querySelector("#dialog-update-post").showModal();
-      }
+  // called when update button is clicked
+  function updateClicked() {
+    console.log("Update button clicked");
+    const updateForm = document.querySelector("#form-update-post");
+    updateForm.title.value = postObject.title;
+    updateForm.body.value = postObject.body;
+    updateForm.image.value = postObject.image;
+    updateForm.setAttribute("data-id", postObject.id);
+    document.querySelector("#dialog-update-post").showModal();
+  }
 
-      
-      // to do  
+  // to do
 }
 
 function deletePostClicked(event) {
@@ -176,14 +217,14 @@ async function createPost(title, body, image) {
 }
 
 function updatePostClicked(event) {
-    event.preventDefault();
-    const form = event.target;
-    const title = form.title.value;
-    const body = form.body.value;
-    const image = form.image.value;
-    const id = form.getAttribute("data-id");
-    updatePost(id, title, body, image);
-    document.querySelector("#dialog-update-post").close();
+  event.preventDefault();
+  const form = event.target;
+  const title = form.title.value;
+  const body = form.body.value;
+  const image = form.image.value;
+  const id = form.getAttribute("data-id");
+  updatePost(id, title, body, image);
+  document.querySelector("#dialog-update-post").close();
 }
 
 // create new post object
@@ -203,12 +244,15 @@ function updatePostClicked(event) {
 async function updatePost(id, title, body, image) {
   const postToUpdate = { title, body, image };
   const json = JSON.stringify(postToUpdate);
-  const response = await fetch(`${endpoint}/posts/${id}.json`, { method: "PUT", body: json });
+  const response = await fetch(`${endpoint}/posts/${id}.json`, {
+    method: "PUT",
+    body: json,
+  });
   if (response.ok) {
     console.log("Post succesfully updated");
     updatePostsGrid();
   }
-  
+
   // post update to update
   // convert the JS object to JSON string
   // PUT fetch request with JSON in the body. Calls the specific element in resource
@@ -238,8 +282,8 @@ function inputSearchChanged(event) {
 }
 
 function searchPosts(searchValue) {
-  searchValue = searchValue.toLowerCase()
-  
+  searchValue = searchValue.toLowerCase();
+
   const results = posts.filter(checkTitle);
   function checkTitle(post) {
     const title = post.title.toLowerCase();
